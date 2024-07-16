@@ -1,0 +1,98 @@
+// ignore_for_file: constant_identifier_names
+
+import 'dart:convert';
+import 'package:digriapan_ventas/models/articulos_model.dart';
+import 'package:http/http.dart' as http;
+import '../models/modelos_clientes.dart';
+import '../models/user_model.dart';
+
+class DatabaseProvider{
+  static const ROOT = 'https://alleatoapps.com/phpapi/digriapan_ventas.php';
+  static const VERSION = "1.0.0";
+
+
+
+  static Future<user> getUserByEmailPassword(
+      String usuario, String password) async {
+    Map data = {
+      'action': "login",
+      'usuario': usuario,
+      'contrasena': password
+    };
+    //encode Map to JSON
+    var body = json.encode(data);
+    var response = await http.post(Uri.parse(ROOT),
+        headers: {"Content-Type": "application/json"}, body: body);
+    if (response.statusCode == 200) {
+      print(response.body);
+      user list = user.fromJson(json.decode(response.body));
+
+      return list;
+    } else {
+      throw <user>[];
+    }
+  }
+
+  static Future<List<clientes>> getClientes(String nombre) async{
+    Map data = {
+      'action': "busca_clientes",
+      'nombre': nombre
+    };
+    var body = json.encode(data);
+    var response = await http.post(Uri.parse(ROOT),
+    headers: {"Content-Type": "application/json"}, body: body);
+    if (response.statusCode == 200){
+      List<clientes> jsonResponse = parseClientes (json.decode(response.body));
+      return jsonResponse;
+    } else {
+      throw <clientes>[];
+    }
+  }
+
+  static List<clientes> parseClientes(Map<String, dynamic> responseBody) {
+    var response = responseBody['clientes'];
+    return (response == null) ? [] : 
+    response.map<clientes>((json) => clientes.fromJson(json))
+        .toList();
+  }
+
+  static Future<List<articulos>> getArticulos(int cliente) async{
+    Map data = {
+      'action': "busca_productos",
+      'cliente': cliente
+    };
+    var body = json.encode(data);
+    var response = await http.post(Uri.parse(ROOT),
+    headers: {"Content-Type": "application/json"}, body: body);
+    if (response.statusCode == 200){
+      return parseArticulos(jsonDecode(response.body));
+    } else {
+      throw <articulos>[];
+    }
+  }
+
+    static List<articulos> parseArticulos(Map<String, dynamic> responseBody) {
+    return responseBody['articulos'].map<articulos>((json) => articulos.fromJson(json))
+        .toList();
+  }
+
+  static Future<int> guardarPedido(int cliente, int vendedor, String comentarios, String detalles) async{
+    Map data = {
+      'action': "guarda_pedido",
+      'cliente': cliente,
+      'vendedor': vendedor,
+      'comentarios': comentarios,
+      'detalles': detalles
+    };
+    var body = json.encode(data);
+    var response = await http.post(Uri.parse(ROOT),
+    headers: {"Content-Type": "application/json"}, body: body);
+    if (response.statusCode == 200){
+      print(response.body);
+      Map<String, dynamic> responseBody = jsonDecode(response.body);
+      return int.parse(responseBody['pedido'].toString());
+    } else {
+      throw 0;
+    }
+  }
+}
