@@ -1,5 +1,6 @@
 import 'package:digriapan_ventas/screens/pantalla_cliente.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/user_model.dart';
 
@@ -19,10 +20,14 @@ class _PantallaInicialState extends State<PantallaInicial> {
         centerTitle: true,
         title: const Text("Inicio"),
         backgroundColor: const Color(0xFFED7914),
+        automaticallyImplyLeading: false,
+        leading: null,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () {
+            onPressed: () async {
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              prefs.clear();
               Navigator.pop(context);
             },
           ),
