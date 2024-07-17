@@ -82,7 +82,13 @@ class _PantallaClientesState extends State<PantallaClientes> {
   Widget listaClientes(BuildContext context){
     return Expanded( // Envuelve ListView.builder en un Expanded
       child: cliente.isEmpty 
-      ? Container() 
+      ? Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(Icons.search, size: 100,),
+          Text("Busca un cliente", style: TextStyle(fontSize: 20),),
+        ],
+      ) 
       : ListView.builder(
         itemCount: cliente.length,
         itemBuilder: (BuildContext context, int index){

@@ -1,5 +1,6 @@
 import 'package:digriapan_ventas/screens/home.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../backend/database_connect.dart';
 import '../backend/mensajes.dart';
 
@@ -15,18 +16,43 @@ class _PantallaLoginState extends State<PantallaLogin> {
   TextEditingController usuarioController = TextEditingController();
   TextEditingController contraseniaController = TextEditingController();
 
+  @override
+  initState() {
+    super.initState();
+    sesionActual();
+  }
+
+  sesionActual() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String usuario = prefs.getString('usuario') ?? "";
+    String contrasenia = prefs.getString('contrasenia') ?? "";
+    if (usuario != "" && contrasenia != "") {
+      usuarioController.text = usuario;
+      contraseniaController.text = contrasenia;
+      iniciarSesion();
+    }
+  }
+
   iniciarSesion() {
-    DatabaseProvider.getUserByEmailPassword(usuarioController.text, contraseniaController.text).then((resultado) {
-      if (resultado.mensaje == "") {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => PantallaInicial(usuario: resultado,)));
-      }else {
-        MensajesProvider.mensajeExtendido(context, "No se pudo iniciar sesión", resultado.mensaje);
-      }
-    }).onError((error, stackTrace) {
-      print(error.toString());
-      print(stackTrace.toString());
-      MensajesProvider.mensajeExtendido(context, "Error", error.toString());
-    });
+    if (usuarioController.text == "" || contraseniaController.text == "") {
+      MensajesProvider.mensajeExtendido(context, "No hay datos", "Debes ingresar un usuario y contraseña");
+    }else{
+      DatabaseProvider.getUserByEmailPassword(usuarioController.text, contraseniaController.text).then((resultado) {
+        if (resultado.mensaje == "") {
+          SharedPreferences.getInstance().then((prefs) {
+            prefs.setString('usuario', usuarioController.text);
+            prefs.setString('contrasenia', contraseniaController.text);
+          });
+          Navigator.push(context, MaterialPageRoute(builder: (context) => PantallaInicial(usuario: resultado,)));
+        }else {
+          MensajesProvider.mensajeExtendido(context, "No se pudo iniciar sesión", resultado.mensaje);
+        }
+      }).onError((error, stackTrace) {
+        print(error.toString());
+        print(stackTrace.toString());
+        MensajesProvider.mensajeExtendido(context, "Error", error.toString()); 
+      });
+    }
   }
 
   @override

@@ -16,7 +16,7 @@ class DatabaseProvider{
       String usuario, String password) async {
     Map data = {
       'action': "login",
-      'usuario': usuario,
+      'usuario': int.parse(usuario),
       'contrasena': password
     };
     //encode Map to JSON
