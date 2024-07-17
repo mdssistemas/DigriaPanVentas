@@ -11,6 +11,25 @@ class DatabaseProvider{
   static const VERSION = "1.0.0";
 
 
+  static Future<bool> pruebaConeccion() async {
+    Map data = {
+      'action': ""
+    };
+    //encode Map to JSON
+    var body = json.encode(data);
+    var response = await http.post(Uri.parse(ROOT),
+        headers: {"Content-Type": "application/json"}, body: body);
+    if (response.statusCode == 200) {
+      print(response.body);
+      if (response.body == "") {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
 
   static Future<user> getUserByEmailPassword(
       String usuario, String password) async {

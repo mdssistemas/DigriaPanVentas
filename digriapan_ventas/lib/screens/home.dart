@@ -19,12 +19,14 @@ class _PantallaInicialState extends State<PantallaInicial> {
         centerTitle: true,
         title: const Text("Inicio"),
         backgroundColor: const Color(0xFFED7914),
-        leading: IconButton(
-          icon: const Icon(Icons.logout),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Column(

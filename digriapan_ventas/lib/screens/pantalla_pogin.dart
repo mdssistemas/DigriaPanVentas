@@ -23,6 +23,8 @@ class _PantallaLoginState extends State<PantallaLogin> {
   }
 
   sesionActual() async {
+DatabaseProvider.pruebaConeccion().then((value) => if (value) MensajesProvider.mensaje(context, "Exito") else MensajesProvider.mensaje(context, "No se pudo")).onError((error, stackTrace) => MensajesProvider.mensaje(context, "Fallo"));
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String usuario = prefs.getString('usuario') ?? "";
     String contrasenia = prefs.getString('contrasenia') ?? "";
