@@ -2,6 +2,7 @@
 
 import 'package:digriapan_ventas/backend/database_connect.dart';
 import 'package:digriapan_ventas/models/modelos_clientes.dart';
+import 'package:digriapan_ventas/screens/home.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -23,15 +24,17 @@ class _PantallaConfirmacionState extends State<PantallaConfirmacion> {
   TextEditingController comentariosController = TextEditingController();
 
    guardadoDePedido(){
+    Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => PantallaInicial(usuario: widget.usuario)),
+                (route) => route.isFirst,
+    );
     String detalles = "";
     widget.listaDeArticulosSelecionados.forEach((element) {
       detalles += "${element.clave_articulo}|${element.cantidad}|${element.precio_sin_IVA}|${element.importe_IVA}Ç";
     });
     DatabaseProvider.guardarPedido(widget.informacion.cliente, widget.usuario.usuario, comentariosController.text, detalles).then((value) {
       if (value != 0){
-        Navigator.pop(context);
-        Navigator.pop(context);
-        Navigator.pop(context);
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => PantallaInicial(usuario: widget.usuario)));
         MensajesProvider.mensajeExtendido(context, "Pedido guardado", "El pedido #${NumberFormat("#,###,###").format(value)} ha sido guardado con éxito");
       } else {
         MensajesProvider.mensajeExtendido(context, "Ha ocurrido un problema", "No se pudo guardar el pedido");

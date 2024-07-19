@@ -27,17 +27,15 @@ class _PantallaLoginState extends State<PantallaLogin> {
     String usuario = prefs.getString('usuario') ?? "";
     String contrasenia = prefs.getString('contrasenia') ?? "";
     if (usuario != "" && contrasenia != "") {
-      usuarioController.text = usuario;
-      contraseniaController.text = contrasenia;
-      iniciarSesion();
+      iniciarSesion(usuario, contrasenia);
     }
   }
 
-  iniciarSesion() {
-    if (usuarioController.text == "" || contraseniaController.text == "") {
+  iniciarSesion(String usuario, String contrasenia) {
+    if (usuario == "" || contrasenia == "") {
       MensajesProvider.mensajeExtendido(context, "No hay datos", "Debes ingresar un usuario y contraseña");
     }else{
-      DatabaseProvider.getUserByEmailPassword(usuarioController.text, contraseniaController.text).then((resultado) {
+      DatabaseProvider.getUserByEmailPassword(usuario, contrasenia).then((resultado) {
         if (resultado.mensaje == "") {
           SharedPreferences.getInstance().then((prefs) {
             prefs.setString('usuario', usuarioController.text);
@@ -176,7 +174,7 @@ class _PantallaLoginState extends State<PantallaLogin> {
       label: const Text("Iniciar sesion"),
       icon: const Icon(Icons.login),
       onPressed: (){
-        iniciarSesion();
+        iniciarSesion(usuarioController.text, contraseniaController.text);
       },
     );
   }

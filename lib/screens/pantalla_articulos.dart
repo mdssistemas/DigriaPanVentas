@@ -44,8 +44,7 @@ class _PantallaArticulosState extends State<PantallaArticulos> {
   guardadoDeProductos(){
     List<articulos> articulosSeleccionados = listaDeArticulos.where((element) => element.cantidad > 0).toList();
     articulosSeleccionados.forEach((element) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => PantallaConfirmacion(listaDeArticulosSelecionados:articulosSeleccionados, informacion: widget.cliente, usuario : widget.usuario,)));
-      
+      Navigator.push(context, MaterialPageRoute(builder: (context) => PantallaConfirmacion(listaDeArticulosSelecionados:articulosSeleccionados, informacion: widget.cliente, usuario : widget.usuario,)));      
     });
   }
 
@@ -60,6 +59,10 @@ class _PantallaArticulosState extends State<PantallaArticulos> {
           IconButton(
             icon: const Icon(Icons.check),
             onPressed: () {
+              if (listaDeArticulos.every((articulo) => articulo.cantidad == 0)) {
+                MensajesProvider.mensajeExtendido(context, "Sin articulos", "No hay articulos para guardar");
+                return;
+              }
               guardadoDeProductos();
             },
           ),],
