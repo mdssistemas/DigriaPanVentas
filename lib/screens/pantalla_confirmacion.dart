@@ -26,7 +26,7 @@ class _PantallaConfirmacionState extends State<PantallaConfirmacion> {
    guardadoDePedido(){
     String detalles = "";
     widget.listaDeArticulosSelecionados.forEach((element) {
-      detalles += "${element.clave_articulo}|${element.cantidad}|${element.precio_sin_IVA}|${element.importe_IVA}Ç";
+      detalles += "${element.clave_articulo}|${element.cantidad}|${element.precio_base}|${element.importe_IVA}Ç";
     });
     DatabaseProvider.guardarPedido(widget.usuario.usuario, widget.informacion.cliente, widget.informacion.domicilio, comentariosController.text, detalles).then((value) {
       if (value != 0){
