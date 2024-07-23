@@ -4,11 +4,12 @@ import 'dart:convert';
 import 'package:digriapan_ventas/models/articulos_model.dart';
 import 'package:http/http.dart' as http;
 import '../models/modelos_clientes.dart';
+import '../models/modelos_direcciones.dart';
 import '../models/user_model.dart';
 
 class DatabaseProvider{
   static const ROOT = 'https://alleatoapps.com/phpapi/digriapan_ventas.php';
-  static const VERSION = "1.0.0";
+  static const VERSION = "1.1.0";
 
 
   static Future<bool> pruebaConeccion() async {
@@ -75,7 +76,7 @@ class DatabaseProvider{
         .toList();
   }
 
-  static Future<List<articulos>> getArticulos(int cliente) async{
+  static Future<List<dynamic>> getArticulos(int cliente) async{
     Map data = {
       'action': "busca_productos",
       'cliente': cliente
@@ -84,22 +85,32 @@ class DatabaseProvider{
     var response = await http.post(Uri.parse(ROOT),
     headers: {"Content-Type": "application/json"}, body: body);
     if (response.statusCode == 200){
-      return parseArticulos(jsonDecode(response.body));
+      List arreglo = [];
+      arreglo.add(parseArticulos(jsonDecode(response.body)));
+      arreglo.add(parseDirecciones(jsonDecode(response.body)));
+      return arreglo;
     } else {
       throw <articulos>[];
     }
   }
 
+  static List<direcciones> parseDirecciones(Map<String, dynamic> responseBody) {
+    return responseBody['direcciones'].map<direcciones>((json) => direcciones.fromJson(json))
+        .toList();
+    
+  }
+  
     static List<articulos> parseArticulos(Map<String, dynamic> responseBody) {
     return responseBody['articulos'].map<articulos>((json) => articulos.fromJson(json))
         .toList();
   }
 
-  static Future<int> guardarPedido(int cliente, int vendedor, String comentarios, String detalles) async{
+  static Future<int> guardarPedido(int vendedor, int cliente, int domicilio, String comentarios, String detalles) async{
     Map data = {
       'action': "guarda_pedido",
-      'cliente': cliente,
       'vendedor': vendedor,
+      'cliente': cliente,
+      'domicilio': domicilio,
       'comentarios': comentarios,
       'detalles': detalles
     };

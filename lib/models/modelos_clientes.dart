@@ -5,6 +5,7 @@ class clientes {
   String nombre_cliente;
   String nombre_comercial;
   String direccion;
+  int domicilio;
   String telefono;
 
   clientes({
@@ -12,6 +13,7 @@ class clientes {
     required this.nombre_cliente,
     required this.nombre_comercial,
     required this.direccion,
+    required this.domicilio,
     required this.telefono
   });
 
@@ -21,6 +23,7 @@ class clientes {
         nombre_cliente: json['nombre_cliente'] as String,
         nombre_comercial: json['nombre_comercial'] as String,
         direccion: json['direccion'] as String,
+        domicilio: json['domicilio'] as int,
         telefono: json['telefono'] as String
     );
   }

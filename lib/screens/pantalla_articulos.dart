@@ -1,5 +1,6 @@
 import 'package:digriapan_ventas/models/articulos_model.dart';
 import 'package:digriapan_ventas/models/modelos_clientes.dart';
+import 'package:digriapan_ventas/screens/pantalla_cambio_sucursal.dart';
 import 'package:digriapan_ventas/screens/pantalla_confirmacion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +9,7 @@ import 'package:intl/intl.dart';
 
 import '../backend/database_connect.dart';
 import '../backend/mensajes.dart';
+import '../models/modelos_direcciones.dart';
 import '../models/user_model.dart';
 
 class PantallaArticulos extends StatefulWidget {
@@ -21,6 +23,7 @@ class PantallaArticulos extends StatefulWidget {
 
 class _PantallaArticulosState extends State<PantallaArticulos> {
   List<articulos> listaDeArticulos = [];
+  List<direcciones> listaDeDirecciones = [];
   String nombreCliente = "";
   @override
   void initState() {
@@ -34,7 +37,8 @@ class _PantallaArticulosState extends State<PantallaArticulos> {
   traerArticulos() {
     DatabaseProvider.getArticulos(widget.cliente.cliente).then((resultado) {
       setState(() {
-        listaDeArticulos = resultado;
+        listaDeArticulos = resultado.first;
+        listaDeDirecciones = resultado.last;
       });
     }).onError((error, stackTrace) {
       MensajesProvider.mensajeExtendido(context, "Error", error.toString());
@@ -113,7 +117,16 @@ class _PantallaArticulosState extends State<PantallaArticulos> {
   }
 
   Widget infoCliente(BuildContext context){
-    return Container(
+    return InkWell(
+      onTap: (){
+        Navigator.push(context, MaterialPageRoute(builder: (context) => PantallaCambioSucursal(listaDeDirecciones: listaDeDirecciones))).then((value) {if(value != null){
+          setState(() {
+            widget.cliente.direccion = value.direccion_ex;
+            widget.cliente.domicilio = value.domicilio;
+          });
+        }});
+      },
+      child: Container(
       padding: const EdgeInsets.all(10),
       margin: const EdgeInsets.symmetric(horizontal: 13),
       decoration: BoxDecoration(
@@ -123,35 +136,49 @@ class _PantallaArticulosState extends State<PantallaArticulos> {
         ),
         borderRadius: BorderRadius.circular(20.0),
       ),
-      child: Column(
+      child: Table(
+        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+        columnWidths: const {
+          1: FractionColumnWidth(0.1), 
+        },
         children: [
+          TableRow(
+            children: [
+          Column(
+            children: [
 
-          Text(
-            "Cliente: $nombreCliente",
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-            textAlign: TextAlign.center,
+              Text(
+                "Cliente: $nombreCliente",
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                "Direccion: ${widget.cliente.direccion}",
+                style: const TextStyle(
+                  fontSize: 16,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 10),
+              Text(widget.cliente.telefono.isEmpty? "" :
+                "Telefono: ${widget.cliente.telefono}",
+                style: const TextStyle(
+                  fontSize: 16,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
-          const SizedBox(height: 10),
-          Text(
-            "Direccion: ${widget.cliente.direccion}",
-            style: const TextStyle(
-              fontSize: 16,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 10),
-          Text(widget.cliente.telefono.isEmpty? "" :
-            "Telefono: ${widget.cliente.telefono}",
-            style: const TextStyle(
-              fontSize: 16,
-            ),
-            textAlign: TextAlign.center,
-          ),
+          const Icon(Icons.chevron_right),
+            ]
+          )
         ],
       ),
+    ),
     );
   }
 
@@ -161,11 +188,79 @@ class _PantallaArticulosState extends State<PantallaArticulos> {
         itemCount: listaDeArticulos.length,
         itemBuilder: (BuildContext context, int index){
           var articulo = listaDeArticulos[index];
+
           return articulo.busqueda? ListTile(
-            trailing: Text("\$${NumberFormat("#,###,##0.00").format(articulo.precio_base)}",
-            style: const TextStyle(
-              fontSize: 17.0,
-              )
+            trailing: InkWell(
+              onTap: (){
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                  double newPrice = articulo.precio_base;
+                  double discountPercentage = 0.0;
+
+                  return AlertDialog(
+                    title: const Text('Cambiar Precio'),
+                    content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                        TextFormField(
+                        onChanged: (String price) {
+                          newPrice = double.parse(price);
+                        },
+                        initialValue: articulo.precio_base.toStringAsFixed(2),
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                        ],
+                        decoration: const InputDecoration(
+                          hintText: 'Nuevo Precio',
+                        ),
+                        ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                      onChanged: (String value) {
+                        discountPercentage = double.parse(value);
+                      },
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        hintText: 'Descuento (%)',
+                      ),
+                      ),
+                    ],
+                    ),
+                    actions: [
+                    TextButton(
+                      onPressed: () {
+                      Navigator.of(context).pop();
+                      },
+                      child: const Text('Cancelar'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                      setState(() {
+                        double discountAmount = newPrice * (discountPercentage / 100); // Calculate discount amount
+                        articulo.precio_base = newPrice - discountAmount; // Apply discount to the price
+                      });
+                      Navigator.of(context).pop();
+                      },
+                      child: const Text('Guardar'),
+                    ),
+                    ],
+                  );
+                  },
+                );
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text("\$${NumberFormat("#,###,##0.00").format(articulo.precio_base)}",
+                  style: const TextStyle(
+                    fontSize: 17.0,
+                    )
+                  ),
+                  const Icon(Icons.arrow_drop_down),
+                ],
+              ),
             ),
             title: Text(articulo.nombre_articulo.trim()),
             subtitle: TextFormField(
