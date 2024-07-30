@@ -37,11 +37,6 @@ class _PantallaClientesState extends State<PantallaClientes> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text("Clientes"),
-        backgroundColor: const Color(0xFFED7914),
-      ),
       body: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -99,9 +94,31 @@ class _PantallaClientesState extends State<PantallaClientes> {
           leading: const Icon(Icons.person),
           trailing: const Icon(Icons.arrow_forward),
           title: Text(nombre_comercial.isNotEmpty? nombre_comercial: clienteActual.nombre_cliente.trim()),
-          onTap: (){
-            Navigator.push(context, MaterialPageRoute(builder: (context) => PantallaArticulos(cliente: clienteActual, usuario: widget.usuario,)));
-          },
+            onTap: (){
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text("Confirmar cliente seleccionado"),
+                content: Text("Cliente: ${clienteActual.nombre_cliente} \nDomicilio: ${clienteActual.direccion}"),
+                actions: [
+                TextButton(
+                  onPressed: (){
+                  Navigator.pop(context);
+                  },
+                  child: const Text("Cancelar"),
+                ),
+                TextButton(
+                  onPressed: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => PantallaArticulos(cliente: clienteActual, usuario: widget.usuario,)));
+                  },
+                  child: const Text("Aceptar"),
+                ),
+                ],
+              );
+              },
+            );
+            },
         ),
           );
         },

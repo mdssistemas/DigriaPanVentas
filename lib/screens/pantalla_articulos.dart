@@ -56,6 +56,13 @@ class _PantallaArticulosState extends State<PantallaArticulos> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.pop(context);
+          },
+        ),
         centerTitle: true,
         title: const Text("Articulos"),
         backgroundColor: const Color(0xFFED7914),
