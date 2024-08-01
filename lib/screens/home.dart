@@ -88,7 +88,7 @@ class _PantallaInicialState extends State<PantallaInicial>
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text("Inicio"),
+        title: Text(selected == 0 ?"Inicio" : "Ordenes del día"),
         backgroundColor: const Color(0xFFED7914),
         automaticallyImplyLeading: false,
         leading: null,
@@ -210,28 +210,6 @@ class _PantallaInicialState extends State<PantallaInicial>
       ),
     );
   }
-
-  Widget iniciarIconoBoton(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => PantallaClientes(usuario: widget.usuario)),
-        );
-      },
-      style: ElevatedButton.styleFrom(
-        primary: const Color(0xFF004D40),
-        padding: const EdgeInsets.all(20),
-        shape: const CircleBorder(),
-      ),
-      child: const Icon(
-        Icons.play_circle_filled,
-        size: 200.0,
-        color: Colors.white,
-      ),
-    );
-  }
 }
 
 class AppBarPainter extends CustomPainter {
@@ -246,7 +224,7 @@ class AppBarPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     var paint = Paint()
-      ..color = Colors.black
+      ..color = const Color(0xFFED7814)
       ..style = PaintingStyle.fill;
 
     var path = Path();

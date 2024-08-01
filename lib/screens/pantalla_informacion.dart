@@ -11,11 +11,7 @@ class PantallaInformacion extends StatelessWidget {
 
   _launchWebURL() async {
   final uri = Uri.parse('https://mds-sistemas.com');
-  if (await canLaunchUrl(uri)) {
-    await launchUrl(uri);
-  } else {
-    throw 'Could not launch $uri';
-  }
+  await launchUrl(uri);
 }
 
 

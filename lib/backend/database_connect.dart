@@ -3,6 +3,8 @@
 import 'dart:convert';
 import 'package:digriapan_ventas/models/articulos_model.dart';
 import 'package:http/http.dart' as http;
+import '../models/modelo_detalles_pedidos.dart';
+import '../models/modelo_pedido_vendedor.dart';
 import '../models/modelos_clientes.dart';
 import '../models/modelos_direcciones.dart';
 import '../models/user_model.dart';
@@ -125,4 +127,34 @@ class DatabaseProvider{
       throw 0;
     }
   }
+
+  static Future<List<dynamic>> getPedidos (int vendedor, String fecha) async {
+    Map data = {
+      'action': "estado_de_pedido",
+      'vendedor': vendedor,
+      'fecha': fecha
+    };
+    var body = json.encode(data);
+    var response = await http.post(Uri.parse(ROOT),
+    headers: {"Content-Type": "application/json"}, body: body);
+    if (response.statusCode == 200){
+      List arreglo = [];
+      arreglo.add(parsePedidos(jsonDecode(response.body)));
+      arreglo.add(parseDetalles(jsonDecode(response.body)));
+      return arreglo;
+    }else{
+      throw <pedidos>[];
+    }
+  }
+
+  static List <pedidos> parsePedidos(Map<String, dynamic> responseBody){
+    return responseBody['pedidos'].map<pedidos>((json) => pedidos.fromJson(json))
+        .toList();
+  }
+
+  static List <detallesPedido> parseDetalles(Map<String, dynamic> responseBody){
+    return responseBody['detalles'].map<detallesPedido>((json) => detallesPedido.fromJson(json))
+        .toList();
+  }
+
 }

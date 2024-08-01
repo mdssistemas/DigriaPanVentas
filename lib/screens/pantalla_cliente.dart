@@ -98,24 +98,38 @@ class _PantallaClientesState extends State<PantallaClientes> {
             showDialog(
               context: context,
               builder: (BuildContext context) {
-              return AlertDialog(
+                return AlertDialog(
                 title: const Text("Confirmar cliente seleccionado"),
                 content: Text("Cliente: ${clienteActual.nombre_cliente} \nDomicilio: ${clienteActual.direccion}"),
                 actions: [
-                TextButton(
+                   const Text('Selecciona el estado de la visita: '),
+                  DropdownButton<String>(
+                  items: <String>['Visitado', 'Cerrado', 'Cerrado permanentemente', 'Regresar despues'].map((String value) {
+                    return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      
+                    });
+                  },
+                  ),
+                  TextButton(
                   onPressed: (){
-                  Navigator.pop(context);
+                    Navigator.pop(context);
                   },
                   child: const Text("Cancelar"),
-                ),
-                TextButton(
+                  ),
+                  TextButton(
                   onPressed: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => PantallaArticulos(cliente: clienteActual, usuario: widget.usuario,)));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => PantallaArticulos(cliente: clienteActual, usuario: widget.usuario,)));
                   },
                   child: const Text("Aceptar"),
-                ),
+                  ),
                 ],
-              );
+                );
               },
             );
             },
