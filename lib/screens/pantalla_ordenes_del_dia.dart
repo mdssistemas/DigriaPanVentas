@@ -27,7 +27,7 @@ class PantallaOrdenesDelDia extends StatefulWidget {
     traerOrdenes(){
       DateTime desde = DateTime.now();
       String fecha = DateFormat('yyyyMMdd').format(desde);
-      DatabaseProvider.getPedidos(widget.usuario.usuario, "20240717").then((value){
+      DatabaseProvider.getPedidos(widget.usuario.usuario, fecha).then((value){
         setState(() {
           ordenes = value.first;
           detalles = value.last;
@@ -43,9 +43,23 @@ class PantallaOrdenesDelDia extends StatefulWidget {
     Widget build(BuildContext context) {
       return Scaffold(
         body: Container(
+              alignment: Alignment.center,
               height: MediaQuery.of(context).size.height * .8,
               padding: const EdgeInsets.all(10),
-              child: ListView.builder(
+              child: ordenes.length == 0
+                ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image.asset(
+                      'assets/images/no-results.png',
+                      width: 200,
+                      height: 200,
+                  ),
+                  Text("No se han encontrado ordenes el dia de hoy")
+                ],
+              )
+                : ListView.builder(
                 itemCount: ordenes.length,
                 itemBuilder: (context, index) {
                   var pedido = ordenes[index];

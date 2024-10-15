@@ -41,7 +41,7 @@ class _PantallaLoginState extends State<PantallaLogin> {
             prefs.setString('usuario', usuarioController.text);
             prefs.setString('contrasenia', contraseniaController.text);
           });
-          Navigator.push(context, MaterialPageRoute(builder: (context) => PantallaInicial(usuario: resultado,)));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => PantallaInicial(usuario: resultado, )));
         }else {
           MensajesProvider.mensajeExtendido(context, "No se pudo iniciar sesión", resultado.mensaje);
         }

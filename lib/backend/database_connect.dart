@@ -11,7 +11,7 @@ import '../models/user_model.dart';
 
 class DatabaseProvider{
   static const ROOT = 'https://alleatoapps.com/phpapi/digriapan_ventas.php';
-  static const VERSION = "1.1.0";
+  static const VERSION = "1.1.1";
 
 
   static Future<bool> pruebaConeccion() async {
@@ -55,15 +55,18 @@ class DatabaseProvider{
     }
   }
 
-  static Future<List<clientes>> getClientes(String nombre) async{
+  static Future<List<clientes>> getClientes(String nombre, int usuario) async{
     Map data = {
-      'action': "busca_clientes",
-      'nombre': nombre
+      'action': "busca_clientes_vendedor",
+      'nombre': nombre,
+      'usuario': usuario
     };
     var body = json.encode(data);
     var response = await http.post(Uri.parse(ROOT),
     headers: {"Content-Type": "application/json"}, body: body);
     if (response.statusCode == 200){
+      print(response.body);
+      print(body);
       List<clientes> jsonResponse = parseClientes (json.decode(response.body));
       return jsonResponse;
     } else {
@@ -148,12 +151,18 @@ class DatabaseProvider{
   }
 
   static List <pedidos> parsePedidos(Map<String, dynamic> responseBody){
-    return responseBody['pedidos'].map<pedidos>((json) => pedidos.fromJson(json))
+    var response = responseBody['pedidos'];
+    return (response == null)
+      ?[]
+      :response.map<pedidos>((json) => pedidos.fromJson(json))
         .toList();
   }
 
   static List <detallesPedido> parseDetalles(Map<String, dynamic> responseBody){
-    return responseBody['detalles'].map<detallesPedido>((json) => detallesPedido.fromJson(json))
+    var response = responseBody['detalles'];
+    return (response == null)
+      ?[]
+      :response.map<detallesPedido>((json) => detallesPedido.fromJson(json))
         .toList();
   }
 
